@@ -1,0 +1,9 @@
+#!/bin/sh
+
+/usr/sbin/addsudo /bin/wget app-joomla
+/usr/sbin/addsudo /bin/zip app-joomla
+/usr/sbin/addsudo /bin/zip app-joomla
+/usr/sbin/addsudo /bin/unzip app-joomla
+/usr/sbin/addsudo /bin/cp app-joomla
+/usr/sbin/addsudo /bin/mv app-joomla
+

@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * Joomla Add project View.
+ *
+ * @category   Apps
+ * @package    Joomla
+ * @subpackage Views
+ * @author     ClearFoundation <developer@clearfoundation.com>
+ * @copyright  2017 ClearFoundation
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU General Public License version 3 or later
+ * @link    http://www.clearfoundation.com/docs/developer/apps/joomla/
+ */
+
+///////////////////////////////////////////////////////////////////////////////
+// Load dependencies
+///////////////////////////////////////////////////////////////////////////////
+
+$this->lang->load('joomla');
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Headers
+///////////////////////////////////////////////////////////////////////////////
+$headers = array(
+    lang('joomla_backup_name'),
+);
+
+///////////////////////////////////////////////////////////////////////////////
+// Buttons
+///////////////////////////////////////////////////////////////////////////////
+
+$buttons  = array(
+	anchor_custom('/app/joomla','Back','low')
+);
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Items
+///////////////////////////////////////////////////////////////////////////////
+foreach ($backups as $value) {
+    $item['title'] = $value['name'];
+    $download_action = "/app/joomla/backup/download/".$value['name'];
+    $delete_action = "/app/joomla/backup/delete/".$value['name'];
+    $item['anchors'] = button_set(
+        array(
+        	anchor_custom($download_action, lang('joomla_download'), 'high'),
+        	anchor_delete($delete_action, 'low'),
+        )
+    );
+    $item['details'] = array(
+        $value['name']
+    );
+    $items[] = $item;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// List table
+///////////////////////////////////////////////////////////////////////////////
+
+echo summary_table(
+    lang('joomla_my_backups'),
+    $buttons,
+    $headers,
+    $items
+);
