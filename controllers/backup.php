@@ -9,7 +9,7 @@
  * @author     ClearFoundation <developer@clearfoundation.com>
  * @copyright  2017 ClearFoundation
  * @license    http://www.gnu.org/copyleft/gpl.html GNU General Public License version 3 or later
- * @link    http://www.clearfoundation.com/docs/developer/apps/wordpress/
+ * @link    http://www.clearfoundation.com/docs/developer/apps/joomla/
  */
 
 
