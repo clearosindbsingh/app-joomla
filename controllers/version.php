@@ -48,40 +48,40 @@
 
 class Version extends ClearOS_Controller
 {
-	/**
+    /**
      * Download Version file on local system
      *
      * @param string $file_name File Name 
      * @return redirect to index after download 
      */ 
     function download($file_name)
-	{
-		// Load dependencies
+    {
+        // Load dependencies
         //------------------
 
-		$this->lang->load('joomla');
-		$this->load->library('joomla/Joomla');
+        $this->lang->load('joomla');
+        $this->load->library('joomla/Joomla');
 
-		$this->joomla->download_version($file_name);
-		$this->page->set_message(lang('joomla_version_download_success'), 'info');
-		redirect('/joomla');
-	}
-	/**
+        $this->joomla->download_version($file_name);
+        $this->page->set_message(lang('joomla_version_download_success'), 'info');
+        redirect('/joomla');
+    }
+    /**
      * Delete Version file on local system
      *
      * @param string $file_name File Name 
      * @return redirect to index after delete 
      */ 
-	function delete($file_name)
-	{
-		// Load dependencies
+    function delete($file_name)
+    {
+        // Load dependencies
         //------------------
 
-		$this->lang->load('joomla');
-		$this->load->library('joomla/Joomla');
+        $this->lang->load('joomla');
+        $this->load->library('joomla/Joomla');
 
-		$this->joomla->delete_version($file_name);
-		$this->page->set_message(lang('joomla_version_delete_success'), 'info');
-		redirect('/joomla');
-	}
+        $this->joomla->delete_version($file_name);
+        $this->page->set_message(lang('joomla_version_delete_success'), 'info');
+        redirect('/joomla');
+    }
 }

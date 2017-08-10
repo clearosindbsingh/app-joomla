@@ -622,15 +622,16 @@ class Joomla extends Daemon
         
         $path_versions = self::PATH_VERSIONS;
         $path_file = $path_versions.$version_file_name;
-
         $file = new File($path_file, TRUE);
+
         if($file->exists())
            return FALSE;
-        
         $versions = $this->get_versions();
         $download_url = '';
+
         foreach ($versions as $key => $value) {
-            if($value['file_name'] == $version_file_name) {
+
+            if ($value['file_name'] == $version_file_name) {
                 $download_url = $value['download_url'];
                 break;
             }
@@ -638,6 +639,7 @@ class Joomla extends Daemon
 
         $shell = new Shell();
         $command = "$download_url -P $path_versions";
+
         try {
             $retval = $shell->execute(
                 self::COMMAND_WGET, $command, TRUE, $options
@@ -699,6 +701,7 @@ class Joomla extends Daemon
     function delete_folder($folder_name)
     {
         clearos_profile(__METHOD__, __LINE__);
+
         $this->get_database_name($folder_name);
         $this->do_backup_folder($folder_name);
         $folder = new Folder($this->get_project_path($folder_name));
@@ -729,6 +732,7 @@ class Joomla extends Daemon
     function delete_installation_dir($folder_name)
     {
         clearos_profile(__METHOD__, __LINE__);
+
         $folder = new Folder($this->get_project_path($folder_name).'installation');
         $folder->delete(TRUE);
     }
@@ -742,6 +746,7 @@ class Joomla extends Daemon
     function do_backup_folder($folder_name)
     {
         clearos_profile(__METHOD__, __LINE__);
+        
         $folder = new Folder(self::PATH_BACKUP);
         if (!$folder->exists())
             $folder->create('root', 'root', 0777);

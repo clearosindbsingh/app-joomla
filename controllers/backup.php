@@ -55,51 +55,51 @@ class Backup extends ClearOS_Controller
      */
     function index()
     {
-		// Load libraries
-    	//---------------
+        // Load libraries
+        //---------------
 
-		$this->lang->load('joomla');
-		$this->load->library('joomla/Joomla');
+        $this->lang->load('joomla');
+        $this->load->library('joomla/Joomla');
 
-		$data['backups'] = $this->joomla->get_backup_list();
-		$this->page->view_form('backups', $data, lang('joomla_available_backup'));
-	}
-	/**
+        $data['backups'] = $this->joomla->get_backup_list();
+        $this->page->view_form('backups', $data, lang('joomla_available_backup'));
+    }
+    /**
      * Download Backup file
      *
      * @param string $file_name File Name
      * @return Start dorce download 
      */ 
     function download($file_name)
-	{
-		// Load libraries
+    {
+        // Load libraries
         //---------------
 
-		$this->lang->load('joomla');
-
-		$this->load->library('joomla/Joomla');
-		$this->joomla->download_backup($file_name);
-	}
-	/**
+        $this->lang->load('joomla');
+        $this->load->library('joomla/Joomla');
+        
+        $this->joomla->download_backup($file_name);
+    }
+    /**
      * Delete joomla version
      *
      * @param @string $file_name File name
      *
      * @return @rediret load backup index page
      */
-	function deletewe($file_name)
-	{
-		// Load libraries
+    function deletewe($file_name)
+    {
+        // Load libraries
         //---------------
 
-		$this->lang->load('joomla');
-		$this->load->library('joomla/Joomla');
+        $this->lang->load('joomla');
+        $this->load->library('joomla/Joomla');
 
-		$this->joomla->delete_backup($file_name);
-		$this->page->set_message(lang('joomla_backup_delete_success'), 'info');
-		redirect('/joomla/backup');
-	}
-	/**
+        $this->joomla->delete_backup($file_name);
+        $this->page->set_message(lang('joomla_backup_delete_success'), 'info');
+        redirect('/joomla/backup');
+    }
+    /**
      * Delete Backup view.
      *
      * @param string $file_name file Nane
@@ -111,7 +111,7 @@ class Backup extends ClearOS_Controller
         // Load libraries
         //---------------
         $this->lang->load('joomla');
-		$this->load->library('joomla/Joomla');
+        $this->load->library('joomla/Joomla');
         
         // Show confirm
         //-------------
@@ -127,16 +127,16 @@ class Backup extends ClearOS_Controller
      *
      * @return @rediret load backup index page
      */
-	function destroy($file_name)
-	{
-		// Load libraries
+    function destroy($file_name)
+    {
+        // Load libraries
         //---------------
 
-		$this->lang->load('joomla');
-		$this->load->library('joomla/Joomla');
+        $this->lang->load('joomla');
+        $this->load->library('joomla/Joomla');
 
-		$this->joomla->delete_backup($file_name);
-		$this->page->set_message(lang('joomla_backup_delete_success'), 'info');
-		redirect('/joomla/backup');
-	}
+        $this->joomla->delete_backup($file_name);
+        $this->page->set_message(lang('joomla_backup_delete_success'), 'info');
+        redirect('/joomla/backup');
+    }
 }
