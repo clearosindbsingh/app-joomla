@@ -45,3 +45,4 @@ $lang['joomla_confirm_delete_project'] 			= 'Are you sure want to delete this pr
 $lang['joomla_yes_delete_this_project'] 		= 'Yes delete this project';
 $lang['joomla_yes_delete_assigned_database'] 	= 'Yes delete assigned database';
 $lang['joomla_fix_permission'] 					= 'Fix Permission';
+$lang['joomla_project_permission_fixed_success'] 					= 'Permission Fixed';
