@@ -114,15 +114,14 @@ class Joomla extends Daemon
     // C O N S T A N T S
     ///////////////////////////////////////////////////////////////////////////
 
-    const PATH_WEBROOT = '/var/www/html';
-    const PATH_JOOMLA = '/var/www/html/joomla';
+    const PATH_JOOMLA = '/var/clearos/joomla/sites';
     const PATH_VERSIONS = '/var/clearos/joomla/versions/';
     const PATH_BACKUP = '/var/clearos/joomla/backup/';
     const COMMAND_MYSQLADMIN = '/usr/bin/mysqladmin';
     const COMMAND_MYSQL = '/usr/bin/mysql';
-    const COMMAND_WGET = '/bin/wget';
-    const COMMAND_ZIP = '/bin/zip';
-    const COMMAND_UNZIP = '/bin/unzip';
+    const COMMAND_WGET = '/usr/bin/wget';
+    const COMMAND_ZIP = '/usr/bin/zip';
+    const COMMAND_UNZIP = '/usr/bin/unzip';
     const COMMAND_MV = '/bin/mv';
     const CONFIG_SAMPLE_FILE_NAME = 'configuration.php';
     const CONFIG_MAIN_FILE_NAME = 'configuration.php';
@@ -539,7 +538,7 @@ class Joomla extends Daemon
         $wpfolder = new Folder(self::PATH_JOOMLA, TRUE);
         $project_path = self::PATH_JOOMLA.'/'.$folder_name;
         if (!$wpfolder->exists()) {
-            $wpfolder->create('root', 'root', 0777);
+            $wpfolder->create('webconfig', 'webconfig', 755);
             return FALSE;
         }
         $project_folder = new Folder($project_path, TRUE);
@@ -563,7 +562,7 @@ class Joomla extends Daemon
             return FALSE;
         }
         $new_folder = new Folder(self::PATH_JOOMLA.'/'.$folder_name, TRUE);
-        $new_folder->create('root', 'root', 0777);
+        $new_folder->create('webconfig', 'webconfig', 755);
 
     }
     /**
@@ -589,7 +588,7 @@ class Joomla extends Daemon
        
         try {
             $retval = $shell->execute(
-                self::COMMAND_UNZIP, $command, TRUE, $options
+                self::COMMAND_UNZIP, $command, FALSE, $options
             );
         } catch (Engine_Exception $e) {
             throw new Exception($e);
@@ -642,7 +641,7 @@ class Joomla extends Daemon
 
         try {
             $retval = $shell->execute(
-                self::COMMAND_WGET, $command, TRUE, $options
+                self::COMMAND_WGET, $command, FALSE, $options
             );
         } catch (Engine_Exception $e) {
             throw new Exception($e);
@@ -715,7 +714,7 @@ class Joomla extends Daemon
      *
      * @return void
      */
-    function set_folder_permissions($folder_name,$permissions = '0755')
+    function set_folder_permissions($folder_name,$permissions = '755')
     {
         clearos_profile(__METHOD__, __LINE__);
        
@@ -749,7 +748,7 @@ class Joomla extends Daemon
         
         $folder = new Folder(self::PATH_BACKUP);
         if (!$folder->exists())
-            $folder->create('root', 'root', 0777);
+            $folder->create('webconfig', 'webconfig', 755);
 
         $folder_path = $this->get_project_path($folder_name);
 
@@ -760,7 +759,7 @@ class Joomla extends Daemon
         $shell = new Shell();
         try {
             $retval = $shell->execute(
-                self::COMMAND_ZIP, $command, TRUE, $options
+                self::COMMAND_ZIP, $command, FALSE, $options
             );
         } catch (Engine_Exception $e) {
             throw new Exception($e);

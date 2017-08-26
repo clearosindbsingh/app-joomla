@@ -123,6 +123,8 @@ class Joomla extends ClearOS_Controller
                 } catch (Exception $e) {
                     $this->page->view_exception($e);
                 }
+            } else {
+                throw new Exception(validation_errors());
             }
         }
         $data['versions'] = $versions;
@@ -196,7 +198,7 @@ class Joomla extends ClearOS_Controller
         $this->lang->load('joomla');
         $this->load->library('joomla/Joomla');
         
-        $this->joomla->set_folder_permissions($folder_name, '0755');
+        $this->joomla->set_folder_permissions($folder_name, '755');
         $this->page->set_message(lang('joomla_project_delete_success'), 'info');
         redirect('/joomla');	
     }

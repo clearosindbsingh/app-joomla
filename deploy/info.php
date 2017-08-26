@@ -37,10 +37,33 @@ $app['core_requires'] = array(
 $app['requires'] = array(
     'app-web-server',
     'app-mariadb',
+    'unzip',
+    'zip',
 );
 
 $app['core_directory_manifest'] = array(
-    '/var/clearos/joomla' => array(),
-    '/var/clearos/joomla/backup' => array(),
-    '/var/clearos/joomla/verions' => array(),
+    '/var/clearos/joomla' => array(
+        'mode' => '0755',
+        'owner' => 'webconfig',
+        'group' => 'webconfig'
+	),
+    '/var/clearos/joomla/backup' => array(
+        'mode' => '0755',
+        'owner' => 'webconfig',
+        'group' => 'webconfig'
+	),
+    '/var/clearos/joomla/versions' => array(
+        'mode' => '0755',
+        'owner' => 'webconfig',
+        'group' => 'webconfig'
+    ),
+    '/var/clearos/joomla/sites' => array(
+        'mode' => '0755',
+        'owner' => 'webconfig',
+        'group' => 'webconfig'
+	)
+);
+
+$app['core_file_manifest'] = array(
+    'app-joomla.conf'=> array('target' => '/etc/httpd/conf.d/app-joomla.conf'),
 );
