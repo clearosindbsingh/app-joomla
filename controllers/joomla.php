@@ -199,7 +199,7 @@ class Joomla extends ClearOS_Controller
         $this->load->library('joomla/Joomla');
         
         $this->joomla->set_folder_permissions($folder_name, '755');
-        $this->page->set_message(lang('joomla_project_delete_success'), 'info');
+        $this->page->set_message(lang('joomla_project_permission_fixed_success'), 'info');
         redirect('/joomla');	
     }
 }
