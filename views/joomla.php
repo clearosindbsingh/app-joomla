@@ -18,6 +18,8 @@
 
 $this->lang->load('joomla');
 
+$server_OK = TRUE;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Form
 ///////////////////////////////////////////////////////////////////////////////
@@ -29,6 +31,20 @@ $options['buttons']  = array(
     anchor_custom('/app/mariadb', "MariaDB Server", 'high', array('target' => '_blank')),
     anchor_custom('/app/web_server', "Web Server", 'high', array('target' => '_blank')),
 );
+
+if ($web_server_running_status == 'stopped') {
+    echo infobox_warning(lang('base_warning'), lang('joomla_web_server_not_running'));
+    $server_OK = FALSE;
+} else if ($mariadb_running_status != 'running') {
+    echo infobox_warning(lang('base_warning'), lang('joomla_mariadb_server_not_running'));
+    $server_OK = FALSE;
+} else if (!$mariadb_password_status) {
+    echo infobox_warning(lang('base_warning'), lang('joomla_mariadb_password_not_set'));
+    $server_OK = FALSE;
+} else if (!$joomla_version_not_downloaded) {
+    echo infobox_warning(lang('base_warning'), lang('joomla_no_joomla_version_downloaded'));
+    $server_OK = FALSE;
+}
 
 echo infobox_highlight(
     lang('joomla_app_name'),
@@ -50,8 +66,12 @@ $headers = array(
 // Buttons
 ///////////////////////////////////////////////////////////////////////////////
 
-$buttons  = array(anchor_custom('/app/joomla/addproject', lang('joomla_add_project'), 'high', array('target' => '_self')));
+if ($server_OK) {
+    $buttons  = array(anchor_custom('/app/joomla/addproject', lang('joomla_add_project'), 'high', array('target' => '_self')));
 
+} else {
+   $buttons  = array(anchor_custom('/app/joomla/addproject', lang('joomla_add_project'), 'high', array('target' => '_self', 'class' => 'disabled', 'disabled' => 'disabled')));
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Items
@@ -63,17 +83,23 @@ foreach ($projects as $value) {
     $fix_action = '/app/joomla/fixit/'.$value['name'];
     $access_admin_action = $base_path.$value['name'].'/wp-admin';
     $delete_action = "javascript:";
-    $fix_btn = anchor_custom('javascript', lang('joomla_fix_permission'), 'low', array('class' => 'disabled','disabled' => 'disabled'));;
-    if($value['permissions'] == 777 && $value['database']) {
-      $fix_btn = anchor_custom($fix_action, lang('joomla_fix_permission'), 'low', array('class' => ''));
+
+    if ($server_OK) {
+        $item['anchors'] = button_set(
+            array(
+            	anchor_custom($access_action, lang('joomla_access_website'), 'high', array('target' => '_blank')),
+            	anchor_delete($delete_action, 'low', array('class' => 'delete_project_anchor', 'data' => array('folder_name' => $value['name']))),
+            )
+        );
+    } else {
+        $item['anchors'] = button_set(
+            array(
+                anchor_custom($access_action, lang('joomla_access_website'), 'high', array('target' => '_blank', 'class' => 'disabled', 'disabled' => 'disabled')),
+                anchor_delete($delete_action, 'low', array('class' => 'delete_project_anchor', 'class' => 'disabled', 'disabled' => 'disabled', 'data' => array('folder_name' => $value['name']))),
+            )
+        );
     }
-    $item['anchors'] = button_set(
-        array(
-        	anchor_custom($access_action, lang('joomla_access_website'), 'high', array('target' => '_blank')),
-        	anchor_delete($delete_action, 'low', array('class' => 'delete_project_anchor', 'data' => array('folder_name' => $value['name']))),
-          $fix_btn,
-        )
-    );
+
     $item['details'] = array(
         $value['name']
     );

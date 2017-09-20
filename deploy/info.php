@@ -7,10 +7,10 @@
 $app['basename'] = 'joomla';
 $app['version'] = '1.0.0';
 $app['release'] = '1';
-$app['vendor'] = 'Vendor'; // e.g. Acme Co
-$app['packager'] = 'Packager'; // e.g. Gordie Howe
-$app['license'] = 'MyLicense'; // e.g. 'GPLv3';
-$app['license_core'] = 'MyLicense'; // e.g. 'LGPLv3';
+$app['vendor'] = 'Xtreem Solution';
+$app['packager'] = 'Xtreem Solution';
+$app['license'] = 'GPL'; // e.g. 'GPLv3';
+$app['license_core'] = 'GPL'; // e.g. 'LGPLv3';
 $app['description'] = lang('joomla_app_description');
 
 /////////////////////////////////////////////////////////////////////////////
@@ -32,6 +32,7 @@ $app['core_requires'] = array(
     'mod_authz_unixgroup',
     'mod_ssl',
     'phpMyAdmin',
+    'app-flexshare-core',
 );
 
 $app['requires'] = array(
@@ -43,22 +44,22 @@ $app['requires'] = array(
 
 $app['core_directory_manifest'] = array(
     '/var/clearos/joomla' => array(
-        'mode' => '0755',
+        'mode' => '0775',
         'owner' => 'webconfig',
         'group' => 'webconfig'
 	),
     '/var/clearos/joomla/backup' => array(
-        'mode' => '0755',
+        'mode' => '0775',
         'owner' => 'webconfig',
         'group' => 'webconfig'
 	),
     '/var/clearos/joomla/versions' => array(
-        'mode' => '0755',
+        'mode' => '0775',
         'owner' => 'webconfig',
         'group' => 'webconfig'
     ),
     '/var/clearos/joomla/sites' => array(
-        'mode' => '0755',
+        'mode' => '0775',
         'owner' => 'webconfig',
         'group' => 'webconfig'
 	)

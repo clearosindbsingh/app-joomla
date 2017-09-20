@@ -63,6 +63,10 @@ class Joomla extends ClearOS_Controller
         $this->load->library('joomla/Joomla');
         $projects = $this->joomla->get_project_list();
         $versions = $this->joomla->get_versions();
+        $data['web_server_running_status'] = $this->joomla->get_web_server_running_status();
+        $data['mariadb_running_status'] = $this->joomla->get_mariadb_running_status();
+        $data['mariadb_password_status'] = $this->joomla->get_mariadb_root_password_set_status();
+        $data['joomla_version_not_downloaded'] = $this->joomla->get_versions(TRUE);
         $data['projects'] = $projects;
         $data['versions'] = $versions;
         $data['base_path'] = 'https://'.$_SERVER['SERVER_ADDR'].'/joomla/';
@@ -83,6 +87,8 @@ class Joomla extends ClearOS_Controller
 
         $this->lang->load('joomla');
         $this->load->library('joomla/Joomla');
+
+        $this->joomla->check_dependencies();
 
         $version_all = $this->joomla->get_versions();
         $versions = array();
@@ -123,8 +129,6 @@ class Joomla extends ClearOS_Controller
                 } catch (Exception $e) {
                     $this->page->view_exception($e);
                 }
-            } else {
-                throw new Exception(validation_errors());
             }
         }
         $data['versions'] = $versions;
@@ -171,7 +175,7 @@ class Joomla extends ClearOS_Controller
                 try {
                     $this->joomla->delete_folder($folder_name);
                     if ($delete_database && $database_name) {
-                        //$this->joomla->backup_database($database_name, $root_username, $root_password); /// due to some temp error I commented it
+                        $this->joomla->backup_database($database_name, $root_username, $root_password);
                         $this->joomla->delete_database($database_name, $root_username, $root_password);
                     }
                     $this->page->set_message(lang('joomla_project_delete_success'), 'info');
@@ -199,7 +203,7 @@ class Joomla extends ClearOS_Controller
         $this->load->library('joomla/Joomla');
         
         $this->joomla->set_folder_permissions($folder_name, '755');
-        $this->page->set_message(lang('joomla_project_permission_fixed_success'), 'info');
+        $this->page->set_message(lang('joomla_project_delete_success'), 'info');
         redirect('/joomla');	
     }
 }

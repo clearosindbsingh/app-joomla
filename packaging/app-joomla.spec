@@ -4,10 +4,10 @@ Epoch: 1
 Version: 1.0.0
 Release: 1%{dist}
 Summary: **joomla_app_name**
-License: MyLicense
+License: GPL
 Group: ClearOS/Apps
-Packager: Packager
-Vendor: Vendor
+Packager: Xtreem Solution
+Vendor: Xtreem Solution
 Source: %{name}-%{version}.tar.gz
 Buildarch: noarch
 Requires: %{name}-core = 1:%{version}-%{release}
@@ -22,13 +22,14 @@ Requires: zip
 
 %package core
 Summary: **joomla_app_name** - Core
-License: MyLicense
+License: GPL
 Group: ClearOS/Libraries
 Requires: app-base-core
 Requires: mod_authnz_external
 Requires: mod_authz_unixgroup
 Requires: mod_ssl
 Requires: phpMyAdmin
+Requires: app-flexshare-core
 
 %description core
 **joomla_app_description**
@@ -43,10 +44,10 @@ This package provides the core API and libraries.
 mkdir -p -m 755 %{buildroot}/usr/clearos/apps/joomla
 cp -r * %{buildroot}/usr/clearos/apps/joomla/
 
-install -d -m 0755 %{buildroot}/var/clearos/joomla
-install -d -m 0755 %{buildroot}/var/clearos/joomla/backup
-install -d -m 0755 %{buildroot}/var/clearos/joomla/sites
-install -d -m 0755 %{buildroot}/var/clearos/joomla/versions
+install -d -m 0775 %{buildroot}/var/clearos/joomla
+install -d -m 0775 %{buildroot}/var/clearos/joomla/backup
+install -d -m 0775 %{buildroot}/var/clearos/joomla/sites
+install -d -m 0775 %{buildroot}/var/clearos/joomla/versions
 install -D -m 0644 packaging/app-joomla.conf %{buildroot}/etc/httpd/conf.d/app-joomla.conf
 
 %post
@@ -87,10 +88,10 @@ exit 0
 %exclude /usr/clearos/apps/joomla/packaging
 %exclude /usr/clearos/apps/joomla/unify.json
 %dir /usr/clearos/apps/joomla
-%dir %attr(0755,webconfig,webconfig) /var/clearos/joomla
-%dir %attr(0755,webconfig,webconfig) /var/clearos/joomla/backup
-%dir %attr(0755,webconfig,webconfig) /var/clearos/joomla/sites
-%dir %attr(0755,webconfig,webconfig) /var/clearos/joomla/versions
+%dir %attr(0775,webconfig,webconfig) /var/clearos/joomla
+%dir %attr(0775,webconfig,webconfig) /var/clearos/joomla/backup
+%dir %attr(0775,apache,apache) /var/clearos/joomla/sites
+%dir %attr(0775,webconfig,webconfig) /var/clearos/joomla/versions
 /usr/clearos/apps/joomla/deploy
 /usr/clearos/apps/joomla/language
 /usr/clearos/apps/joomla/libraries

@@ -69,6 +69,9 @@ use \clearos\apps\base\File_Types as File_Types;
 use \clearos\apps\base\Folder as Folder;
 use \clearos\apps\base\Tuning as Tuning;
 use \clearos\apps\network\Role as Role;
+use \clearos\apps\mariadb\MariaDB as MariaDB;
+use \clearos\apps\web_server\Httpd as Httpd;
+use \clearos\apps\flexshare\Flexshare as Flexshare;
 
 clearos_load_library('base/Daemon');
 clearos_load_library('base/File');
@@ -77,6 +80,9 @@ clearos_load_library('base/File_Types');
 clearos_load_library('base/Folder');
 clearos_load_library('base/Tuning');
 clearos_load_library('network/Role');
+clearos_load_library('mariadb/MariaDB');
+clearos_load_library('web_server/Httpd');
+clearos_load_library('flexshare/Flexshare');
 
 // Exceptions
 //-----------
@@ -86,11 +92,15 @@ use \clearos\apps\base\Engine_Exception as Engine_Exception;
 use \clearos\apps\base\File_No_Match_Exception as File_No_Match_Exception;
 use \clearos\apps\base\File_Not_Found_Exception as File_Not_Found_Exception;
 use \clearos\apps\base\Validation_Exception as Validation_Exception;
+use \clearos\apps\flexshare\Flexshare_Not_Found_Exception as Flexshare_Not_Found_Exception;
+use \clearos\apps\accounts\Accounts_Driver_Not_Set_Exception as Accounts_Driver_Not_Set_Exception;
 
 clearos_load_library('base/Engine_Exception');
 clearos_load_library('base/File_No_Match_Exception');
 clearos_load_library('base/File_Not_Found_Exception');
 clearos_load_library('base/Validation_Exception');
+clearos_load_library('flexshare/Flexshare_Not_Found_Exception');
+clearos_load_library('accounts/Accounts_Driver_Not_Set_Exception');
 
 ///////////////////////////////////////////////////////////////////////////////
 // C L A S S
@@ -119,6 +129,7 @@ class Joomla extends Daemon
     const PATH_BACKUP = '/var/clearos/joomla/backup/';
     const COMMAND_MYSQLADMIN = '/usr/bin/mysqladmin';
     const COMMAND_MYSQL = '/usr/bin/mysql';
+    const COMMAND_MYSQLDUMP = '/usr/bin/mysqldump';
     const COMMAND_WGET = '/usr/bin/wget';
     const COMMAND_ZIP = '/usr/bin/zip';
     const COMMAND_UNZIP = '/usr/bin/unzip';
@@ -160,11 +171,66 @@ class Joomla extends Daemon
         return self::PATH_JOOMLA.'/'.$folder_name.'/';
     }
     /**
+     * Get MariaDB Running Status
+     *
+     * @return @string status
+     */
+    function get_mariadb_running_status()
+    {
+        $mariadb = new MariaDB();
+        $status = $mariadb->get_status();
+        return $status;
+    }
+    /**
+     * Get MariaDB Password Status
+     *
+     * @return @boolean status
+     */
+    function get_mariadb_root_password_set_status()
+    {
+        $mariadb = new MariaDB();
+        $status = $mariadb->is_root_password_set();
+        return $status;
+    }
+    /**
+     * Get Web Server Running Status
+     *
+     * @return @string status
+     */
+    function get_web_server_running_status()
+    {
+        $web_server = new Httpd();
+        $status = $web_server->get_status();
+        return $status;
+    }
+    /**
+     * Check Dependencies Beofre Add A Poject
+     *
+     * @return void
+     * @return Exception when somethings goes wrong with Dependencies 
+     */
+    function check_dependencies()
+    {
+        $error = '';
+        if ($this->get_web_server_running_status() == 'stopped') {
+            $error = lang('joomla_web_server_not_running');
+        } else if ($this->get_mariadb_running_status() != 'running') {
+            $error = lang('joomla_mariadb_server_not_running');
+        } else if (!$this->get_mariadb_root_password_set_status()) {
+            $error = lang('joomla_mariadb_password_not_set');
+        } else if (!$this->get_versions(TRUE)) {
+            $error = lang('joomla_no_joomla_version_downloaded');
+        }
+        if ($error) {
+            throw new Engine_Exception($error);
+        }
+    }
+    /**
      * Get joomla version
      *
      * @return @array Array of available versions
      */
-    function get_versions()
+    function get_versions($only_downloaded =FALSE)
     {
         $versions = array(
             array(
@@ -219,6 +285,10 @@ class Joomla extends Daemon
         foreach ($versions as $key => $value) {
             $versions[$key]['file_name'] = basename($versions[$key]['download_url']);
             $versions[$key]['clearos_path'] = $this->get_joomla_version_downloaded_path(basename($versions[$key]['download_url']));
+            if ($only_downloaded) {
+                if (!$versions[$key]['clearos_path'])
+                    unset($versions[$key]);
+            }
         }
         return $versions;
     }
@@ -290,6 +360,26 @@ class Joomla extends Daemon
         //$this->set_database_user($folder_name, $database_username);
         //$this->set_database_password($folder_name, $database_user_password);
         //$this->delete_installation_dir($folder_name);
+
+        // Add Flexshare
+        // -------------
+
+        $flexshare = new Flexshare();
+        $comment = lang('joomla_app_name') . ' - ' . $folder_name;
+        $group = 'allusers';
+
+        try {
+
+            $flexshare->add_share($folder_name, $comment, $group, $this->get_project_path($folder_name), Flexshare::TYPE_WEB_SITE);
+        } catch (Accounts_Driver_Not_Set_Exception $e) {
+
+            $folder = new Folder($this->get_project_path($folder_name));
+            $folder->delete(TRUE);
+
+            //$this->page->set_message(lang('joomla_set_account_driver_first'), 'info'); // Still need to setup a message here
+            redirect('/accounts');
+        }
+
         return $output;
     }
     /**
@@ -538,7 +628,7 @@ class Joomla extends Daemon
         $wpfolder = new Folder(self::PATH_JOOMLA, TRUE);
         $project_path = self::PATH_JOOMLA.'/'.$folder_name;
         if (!$wpfolder->exists()) {
-            $wpfolder->create('webconfig', 'webconfig', 755);
+            $wpfolder->create('webconfig', 'webconfig', 775);
             return FALSE;
         }
         $project_folder = new Folder($project_path, TRUE);
@@ -562,7 +652,7 @@ class Joomla extends Daemon
             return FALSE;
         }
         $new_folder = new Folder(self::PATH_JOOMLA.'/'.$folder_name, TRUE);
-        $new_folder->create('webconfig', 'webconfig', 755);
+        $new_folder->create('webconfig', 'webconfig', 775);
 
     }
     /**
@@ -596,13 +686,17 @@ class Joomla extends Daemon
         $output = $shell->get_output();
 
         $folder = new Folder($this->get_project_path($folder_name));
-        $folder->chmod(777);
+        $folder->chmod(775, TRUE);
+        $folder->chown('apache', 'apache', TRUE);
 
-        $folder = new Folder($this->get_project_path($folder_name).'installation');
-        $folder->chmod(777);
+        /*$folder = new Folder($this->get_project_path($folder_name).'installation');
+        $folder->chmod(775);
 
         $folder = new Folder($this->get_project_path($folder_name).'cache');
-        $folder->chmod(777);
+        $folder->chmod(775);
+
+        $folder = new Folder($this->get_project_path($folder_name).'administrator/cache');
+        $folder->chmod(775);*/
         
         return $output;
     }
@@ -705,6 +799,12 @@ class Joomla extends Daemon
         $this->do_backup_folder($folder_name);
         $folder = new Folder($this->get_project_path($folder_name));
         $folder->delete(TRUE);
+
+        // Flexshre delete
+        /////////////////
+
+        $flexshare = new Flexshare();
+        $flexshare->delete_share($folder_name, TRUE);
     }
     /**
      * Delete project folder.
@@ -828,12 +928,12 @@ class Joomla extends Daemon
     function backup_database($database_name, $root_username, $root_password)
     {
         $sql_file_path = self::PATH_BACKUP.$database_name.'__'.date('Y-m-d-H-i-s').'.sql';
-        $command = "mysql -u $root_username -p$root_password -e \"mysqldump $database_name > $sql_file_path\"";
+        $command = " -u $root_username -p$root_password $database_name > $sql_file_path";
         //echo $command; die;
         $shell = new Shell();
         try {
             $retval = $shell->execute(
-                self::COMMAND_MYSQL, $command, FALSE, $options
+                self::COMMAND_MYSQLDUMP, $command, FALSE, $options
             );
         } catch (Engine_Exception $e) {
             throw new Exception($e->get_message());
